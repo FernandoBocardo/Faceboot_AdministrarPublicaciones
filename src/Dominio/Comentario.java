@@ -34,9 +34,6 @@ public class Comentario implements Serializable{
     @Column (name="mensaje",nullable=false,length=45)
     private String mensaje;
     
-    @Column (name="imagen",nullable=true,length=45)
-    private String imagen;
-    
     @ManyToOne()
     @JoinColumn(name = "id_publicacion")
     private Publicacion publicacion;
@@ -50,12 +47,6 @@ public class Comentario implements Serializable{
 
     public Comentario(String mensaje, Publicacion publicacion) {
         this.mensaje = mensaje;
-        this.publicacion = publicacion;
-    }
-    
-    public Comentario(String mensaje, String imagen, Publicacion publicacion) {
-        this.mensaje = mensaje;
-        this.imagen = imagen;
         this.publicacion = publicacion;
     }
 
@@ -73,14 +64,6 @@ public class Comentario implements Serializable{
 
     public void setMensaje(String mensaje) {
         this.mensaje = mensaje;
-    }
-
-    public String getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
     }
 
     public Publicacion getPublicacion() {
@@ -117,7 +100,7 @@ public class Comentario implements Serializable{
 
     @Override
     public String toString() {
-        return "Comentario{" + "id=" + id + ", mensaje=" + mensaje + ", imagen=" + imagen + ", publicacion=" + publicacion + '}';
+        return "Comentario{" + "id=" + id + ", mensaje=" + mensaje + ", publicacion=" + publicacion + '}';
     }
 
 }

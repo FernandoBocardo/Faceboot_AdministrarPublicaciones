@@ -13,10 +13,10 @@ import javax.persistence.EntityManager;
  * @author Carlos
  */
 public class ComentariosDAO implements IComentariosDAO{
-    private IConexionUsuariosBD conexion;
+    private IConexionPublicacionesBD conexion;
 
         public ComentariosDAO() {
-        this.conexion = new ConexionUsuariosBD();
+        this.conexion = new ConexionPublicacionesBD();
     }
     
     @Override

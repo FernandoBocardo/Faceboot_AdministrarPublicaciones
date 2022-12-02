@@ -6,6 +6,7 @@ package Datos;
 
 import Dominio.Publicacion;
 import Dominio.Usuario;
+import java.util.List;
 
 /**
  *
@@ -13,8 +14,7 @@ import Dominio.Usuario;
  */
 public interface IPublicacionesDAO {
     public boolean RegistrarPublicacion(Publicacion publicacion);
-    public boolean ConsultarUsuario(Publicacion publicacion, Usuario usuario);
-    public boolean ConsultarEtiqueta(Publicacion etiqueta);
-    public boolean EliminarPublicacion(Publicacion publicacion, Usuario usuario);
-    public boolean EditarPublicacion(Publicacion publicacion, Usuario usuario);
+    public Publicacion consultarPublicacion(Long id);
+    public List<Publicacion> consultarTodas();
+    public List<Publicacion> consultarPorUsuario(Usuario usuario);
 }

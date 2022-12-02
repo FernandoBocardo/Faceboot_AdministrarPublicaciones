@@ -7,6 +7,7 @@ package Negocios;
 import Datos.PublicacionesDAO;
 import Dominio.Publicacion;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
 /**
  *
@@ -39,39 +40,9 @@ public class CtrlPublicacion {
         return false;
     }
     
-    public boolean EditarPublicacion(String publicacionJson)
+    public List<Publicacion> consultarTodas()
     {
-        if(publicacionesDAO.EditarPublicacion(mapper(publicacionJson),null))
-        {
-            return true;
-        }
-        return false;
+        return publicacionesDAO.consultarTodas();
     }
     
-    public boolean ConsultarEtiqueta(String publicacionJson)
-    {
-        if(publicacionesDAO.ConsultarEtiqueta(mapper(publicacionJson)))
-        {
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean EliminarPublicacion(String publicacionJson)
-    {
-        if(publicacionesDAO.EliminarPublicacion(mapper(publicacionJson),null))
-        {
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean ConsultarUsuario(String publicacionJson)
-    {
-        if(publicacionesDAO.ConsultarUsuario(mapper(publicacionJson),null))
-        {
-            return true;
-        }
-        return false;
-    }
 }

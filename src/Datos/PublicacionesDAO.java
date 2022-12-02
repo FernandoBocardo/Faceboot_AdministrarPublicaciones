@@ -6,6 +6,7 @@ package Datos;
 
 import Dominio.Publicacion;
 import Dominio.Usuario;
+import java.util.List;
 import javax.persistence.EntityManager;
 
 /**
@@ -35,69 +36,45 @@ public class PublicacionesDAO implements IPublicacionesDAO{
     }
 
     @Override
-    public boolean ConsultarUsuario(Publicacion publicacion,Usuario usuario) {
+    public Publicacion consultarPublicacion(Long id_publicacion) {
         try {
             EntityManager em = this.conexion.crearConexion();
-            em.getTransaction().begin();
-            publicacion.getUsuariosEtiquetados().contains(usuario);
-            em.getTransaction().commit();
-            return true;
+            return em.find(Publicacion.class, id_publicacion);
         } catch (IllegalStateException ex) {
-            System.err.print("No se pudo consultar por usuario");
+            System.err.print("No se pudo encontrar la publicación con el ID: " + id_publicacion);
             ex.printStackTrace();
-            return false;
+            return null;
         }
     }
 
     @Override
-    public boolean EliminarPublicacion(Publicacion publicacion, Usuario usuario) {
+    public List<Publicacion> consultarTodas() {
         try {
             EntityManager em = this.conexion.crearConexion();
-            em.getTransaction().begin();
-            if(publicacion.getUsuario().getId()==usuario.getId()){
-                em.remove(publicacion);
-            }
-            em.getTransaction().commit();
-            return true;
+            return em.createQuery(
+                "SELECT p FROM Publicacion p")
+                .getResultList();
         } catch (IllegalStateException ex) {
-            System.err.print("No se pudo eliminar la publicación");
+            System.err.print("No se pudo consultar las publicaciones");
             ex.printStackTrace();
-            return false;
-        }
-    }
-
-    @Override
-    public boolean ConsultarEtiqueta(Publicacion etiqueta) {
-        try {
-            EntityManager em = this.conexion.crearConexion();
-            em.getTransaction().begin();
-            em.contains(etiqueta.getEtiquetas());
-            em.getTransaction().commit();
-            return true;
-        } catch (IllegalStateException ex) {
-            System.err.print("No se pudo consultar por etiqueta");
-            ex.printStackTrace();
-            return false;
+            return null;
         }
     }
     
-    @Override
-    public boolean EditarPublicacion(Publicacion publicacion, Usuario usuario) {
+     @Override
+    public List<Publicacion> consultarPorUsuario(Usuario usuario)
+    {
         try {
             EntityManager em = this.conexion.crearConexion();
-            em.getTransaction().begin();
-            if(publicacion.getUsuario().getId()==usuario.getId()){
-
-            }
-            else{
-                System.err.print("No es su propia publicacion");
-            }
-            em.getTransaction().commit();
-            return true;
+            return em.createQuery(
+                "SELECT p FROM Publicacion p WHERE p.usuario = ?1")
+                .setParameter(1, usuario)
+                .getResultList();
         } catch (IllegalStateException ex) {
-            System.err.print("No se pudo consultar por etiqueta");
+            System.err.print("No se pudo consultar las publicaciones");
             ex.printStackTrace();
-            return false;
+            return null;
         }
     }
+
 }
