@@ -6,6 +6,7 @@ package Datos;
 
 import Dominio.Comentario;
 import Dominio.Usuario;
+import java.util.List;
 import javax.persistence.EntityManager;
 
 /**
@@ -22,7 +23,7 @@ public class ComentariosDAO implements IComentariosDAO{
     }
     
     @Override
-    public boolean AgregarComentario(Comentario comentario) {
+    public boolean registrarComentario(Comentario comentario) {
         try {
             EntityManager em = this.conexion.crearConexion();
             em.getTransaction().begin();
@@ -30,14 +31,14 @@ public class ComentariosDAO implements IComentariosDAO{
             em.getTransaction().commit();
             return true;
         } catch (IllegalStateException ex) {
-            System.err.print("No se pudo agregar el comentario");
+            System.err.print("No se pudo registrar el comentario");
             ex.printStackTrace();
             return false;
         }
     }
 
     @Override
-    public boolean EliminarComentario(Comentario comentario) {
+    public boolean eliminarComentario(Comentario comentario) {
         try {
             EntityManager em = this.conexion.crearConexion();
             em.getTransaction().begin();
@@ -48,6 +49,48 @@ public class ComentariosDAO implements IComentariosDAO{
             System.err.print("No se pudo eliminar el comentario");
             ex.printStackTrace();
             return false;
+        }
+    }
+    
+    @Override
+    public List<Comentario> consultarPorUsuario(Usuario usuario)
+    {
+        try {
+            EntityManager em = this.conexion.crearConexion();
+            return em.createQuery(
+                "SELECT c FROM Comentario c WHERE c.usuario = ?1")
+                .setParameter(1, usuario)
+                .getResultList();
+        } catch (IllegalStateException ex) {
+            System.err.print("No se pudo consultar los comentarios");
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Comentario consultarComentario(Long id_comentario) {
+        try {
+            EntityManager em = this.conexion.crearConexion();
+            return em.find(Comentario.class, id_comentario);
+        } catch (IllegalStateException ex) {
+            System.err.print("No se pudo encontrar el comentario con el ID: " + id_comentario);
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Comentario> consultarTodos() {
+        try {
+            EntityManager em = this.conexion.crearConexion();
+            return em.createQuery(
+                "SELECT c FROM Comentario c")
+                .getResultList();
+        } catch (IllegalStateException ex) {
+            System.err.print("No se pudo consultar los comentarios");
+            ex.printStackTrace();
+            return null;
         }
     }
     

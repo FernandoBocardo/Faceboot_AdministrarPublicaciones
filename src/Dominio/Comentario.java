@@ -31,6 +31,10 @@ public class Comentario implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @ManyToOne()
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private Usuario usuario;
+    
     @Column (name="mensaje",nullable=false,length=45)
     private String mensaje;
     
@@ -45,7 +49,15 @@ public class Comentario implements Serializable{
         this.id = id;
     }
 
-    public Comentario(String mensaje, Publicacion publicacion) {
+    public Comentario(Long id, Usuario usuario, String mensaje, Publicacion publicacion) {
+        this.id = id;
+        this.usuario = usuario;
+        this.mensaje = mensaje;
+        this.publicacion = publicacion;
+    }
+
+    public Comentario(Usuario usuario, String mensaje, Publicacion publicacion) {
+        this.usuario = usuario;
         this.mensaje = mensaje;
         this.publicacion = publicacion;
     }
@@ -56,6 +68,14 @@ public class Comentario implements Serializable{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public String getMensaje() {
@@ -73,9 +93,7 @@ public class Comentario implements Serializable{
     public void setPublicacion(Publicacion publicacion) {
         this.publicacion = publicacion;
     }
-
     
-
     @Override
     public int hashCode() {
         int hash = 3;
@@ -100,7 +118,7 @@ public class Comentario implements Serializable{
 
     @Override
     public String toString() {
-        return "Comentario{" + "id=" + id + ", mensaje=" + mensaje + ", publicacion=" + publicacion + '}';
+        return "Comentario{" + "id=" + id + ", usuario=" + usuario + ", mensaje=" + mensaje + ", publicacion=" + publicacion + '}';
     }
 
 }

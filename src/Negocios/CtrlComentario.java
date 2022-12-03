@@ -8,6 +8,7 @@ import Datos.ComentariosDAO;
 import Datos.IComentariosDAO;
 import Dominio.Comentario;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
 /**
  *
@@ -37,21 +38,40 @@ public class CtrlComentario {
         return comentario;
     }
     
-    public boolean AgregarComentario(String comentarioJson)
+    public boolean registrarComentario(String comentarioJson)
     {
-        if(comentariosDAO.AgregarComentario(mapper(comentarioJson)))
+        if(comentariosDAO.registrarComentario(mapper(comentarioJson)))
         {
             return true;
         }
         return false;
     }
     
-    public boolean EliminarComentario(String comentarioJson)
+    public List<Comentario> consultarPorUsuario(String usuarioJson)
     {
-        if(comentariosDAO.EliminarComentario(mapper(comentarioJson)))
+        CtrlUsuario ctrlUsuario = new CtrlUsuario();
+        return comentariosDAO.consultarPorUsuario(ctrlUsuario.mapper(usuarioJson));
+    }
+    
+    public boolean eliminarComentario(String comentarioJson, String usuarioJson)
+    {
+        List<Comentario> comentariosDeUsuario = consultarPorUsuario(usuarioJson);
+        if(comentariosDeUsuario.contains(mapper(comentarioJson)))
         {
+            comentariosDAO.eliminarComentario(mapper(comentarioJson));
             return true;
         }
         return false;
     }
+    
+    public Comentario consultarComentario(String publicacionJson)
+    {
+        return comentariosDAO.consultarComentario(mapper(publicacionJson).getId());
+    }
+    
+    public List<Comentario> consultarTodos()
+    {
+        return comentariosDAO.consultarTodos();
+    }
+    
 }

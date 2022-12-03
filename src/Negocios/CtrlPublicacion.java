@@ -6,6 +6,7 @@ package Negocios;
 
 import Datos.IPublicacionesDAO;
 import Datos.PublicacionesDAO;
+import Dominio.Etiqueta;
 import Dominio.Publicacion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -38,18 +39,46 @@ public class CtrlPublicacion {
         return publicacion;
     }
     
-    public boolean RegistrarPublicacion(String usuarioJson)
+    public boolean registrarPublicacion(String publicacionJson)
     {
-        if(publicacionesDAO.RegistrarPublicacion(mapper(usuarioJson)))
+        if(publicacionesDAO.registrarPublicacion(mapper(publicacionJson)))
         {
             return true;
         }
         return false;
     }
     
+    public boolean eliminarPublicacion(String publicacionJson, String usuarioJson)
+    {
+        List<Publicacion> comentariosDeUsuario = consultarPorUsuario(usuarioJson);
+        if(comentariosDeUsuario.contains(mapper(publicacionJson)))
+        {
+            publicacionesDAO.eliminarPublicacion(mapper(publicacionJson));
+            return true;
+        }
+        return false;
+    }
+    
+    public Publicacion consultarPublicacion(String publicacionJson)
+    {
+        return publicacionesDAO.consultarPublicacion(mapper(publicacionJson).getId());
+    }
+    
     public List<Publicacion> consultarTodas()
     {
         return publicacionesDAO.consultarTodas();
+    }
+    
+    public List<Publicacion> consultarPorUsuario(String usuarioJson)
+    {
+        CtrlUsuario ctrlUsuario = new CtrlUsuario();
+        return publicacionesDAO.consultarPorUsuario(ctrlUsuario.mapper(usuarioJson));
+    }
+    
+    public List<Publicacion> consultarPorEtiqueta(String nombreEtiqueta)
+    {
+        Etiqueta etiqueta = new Etiqueta(nombreEtiqueta);
+        return publicacionesDAO.consultarPorEtiqueta(etiqueta);
     }
     
 }

@@ -6,12 +6,16 @@ package Datos;
 
 import Dominio.Comentario;
 import Dominio.Usuario;
+import java.util.List;
 
 /**
  *
  * @author Carlos
  */
 public interface IComentariosDAO {
-    public boolean AgregarComentario(Comentario comentario);
-    public boolean EliminarComentario(Comentario comentario);
+    public boolean registrarComentario(Comentario comentario);
+    public boolean eliminarComentario(Comentario comentario);
+    public Comentario consultarComentario(Long id_comentario);
+    public List<Comentario> consultarTodos();
+    public List<Comentario> consultarPorUsuario(Usuario usuario);
 }
