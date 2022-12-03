@@ -14,10 +14,12 @@ import javax.persistence.EntityManager;
  * @author Carlos
  */
 public class PublicacionesDAO implements IPublicacionesDAO{
-     private IConexionPublicacionesBD conexion;
+    
+    private IConexionPublicacionesBD conexion;
 
-        public PublicacionesDAO() {
-        this.conexion = new ConexionPublicacionesBD();
+    public PublicacionesDAO() 
+    {
+        this.conexion = ConexionPublicacionesBD.getInstance();
     }
         
     @Override

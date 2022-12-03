@@ -13,10 +13,12 @@ import javax.persistence.EntityManager;
  * @author Carlos
  */
 public class ComentariosDAO implements IComentariosDAO{
+    
     private IConexionPublicacionesBD conexion;
 
-        public ComentariosDAO() {
-        this.conexion = new ConexionPublicacionesBD();
+    public ComentariosDAO() 
+    {
+        this.conexion = ConexionPublicacionesBD.getInstance();
     }
     
     @Override
@@ -35,7 +37,7 @@ public class ComentariosDAO implements IComentariosDAO{
     }
 
     @Override
-    public boolean EliminarComentario(Comentario comentario, Usuario usuario) {
+    public boolean EliminarComentario(Comentario comentario) {
         try {
             EntityManager em = this.conexion.crearConexion();
             em.getTransaction().begin();

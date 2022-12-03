@@ -4,6 +4,7 @@
  */
 package Negocios;
 
+import Datos.IPublicacionesDAO;
 import Datos.PublicacionesDAO;
 import Dominio.Publicacion;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,13 @@ import java.util.List;
  * @author Carlos
  */
 public class CtrlPublicacion {
-    private PublicacionesDAO publicacionesDAO = new PublicacionesDAO();
+    
+    private IPublicacionesDAO publicacionesDAO;
+    
+    public CtrlPublicacion()
+    {
+        this.publicacionesDAO = new PublicacionesDAO();
+    }
     
     public Publicacion mapper(String json)
     {

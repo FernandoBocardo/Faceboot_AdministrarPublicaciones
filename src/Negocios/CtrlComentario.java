@@ -5,6 +5,7 @@
 package Negocios;
 
 import Datos.ComentariosDAO;
+import Datos.IComentariosDAO;
 import Dominio.Comentario;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,35 +14,41 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Carlos
  */
 public class CtrlComentario {
-    private ComentariosDAO comentariosDAO = new ComentariosDAO();
+    
+    private IComentariosDAO comentariosDAO;
+    
+    public CtrlComentario()
+    {
+        this.comentariosDAO = new ComentariosDAO();
+    }
     
     public Comentario mapper(String json)
     {
-        Comentario publicacion = null;
+        Comentario comentario = null;
         try
         {
             ObjectMapper objectMapper = new ObjectMapper();
-            publicacion = objectMapper.readValue(json, Comentario.class);
+            comentario = objectMapper.readValue(json, Comentario.class);
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
-        return publicacion;
+        return comentario;
     }
     
-    public boolean AgregarComentario(String usuarioJson)
+    public boolean AgregarComentario(String comentarioJson)
     {
-        if(comentariosDAO.AgregarComentario(mapper(usuarioJson)))
+        if(comentariosDAO.AgregarComentario(mapper(comentarioJson)))
         {
             return true;
         }
         return false;
     }
     
-    public boolean EliminarComentario(String usuarioJson)
+    public boolean EliminarComentario(String comentarioJson)
     {
-        if(comentariosDAO.EliminarComentario(mapper(usuarioJson),null))
+        if(comentariosDAO.EliminarComentario(mapper(comentarioJson)))
         {
             return true;
         }

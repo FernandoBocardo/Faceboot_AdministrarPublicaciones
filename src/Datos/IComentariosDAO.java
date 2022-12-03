@@ -13,5 +13,5 @@ import Dominio.Usuario;
  */
 public interface IComentariosDAO {
     public boolean AgregarComentario(Comentario comentario);
-    public boolean EliminarComentario(Comentario comentario, Usuario usuario);
+    public boolean EliminarComentario(Comentario comentario);
 }
