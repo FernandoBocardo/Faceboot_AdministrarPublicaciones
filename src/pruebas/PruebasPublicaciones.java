@@ -30,7 +30,6 @@ public class PruebasPublicaciones {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        
         IPublicacionesDAO publicacionesDAO = new PublicacionesDAO();
         IComentariosDAO comentariosDAO = new ComentariosDAO();
         IUsuariosDAO usuariosDAO = new UsuariosDAO();

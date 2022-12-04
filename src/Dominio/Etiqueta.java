@@ -4,6 +4,7 @@
  */
 package Dominio;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -34,6 +35,7 @@ public class Etiqueta implements Serializable {
     @Column (name="nombreEtiqueta",nullable=false, unique = true)
     private String nombreEtiqueta;
     
+    @JsonIgnoreProperties("etiquetas")
     @ManyToMany(mappedBy = "etiquetas")
     private List<Publicacion> publicaciones;
 

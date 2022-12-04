@@ -4,6 +4,7 @@
  */
 package Dominio;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.List;
@@ -38,6 +39,7 @@ public class Comentario implements Serializable{
     @Column (name="mensaje",nullable=false,length=45)
     private String mensaje;
     
+    @JsonIgnoreProperties("comentarios")
     @ManyToOne()
     @JoinColumn(name = "id_publicacion")
     private Publicacion publicacion;

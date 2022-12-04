@@ -4,6 +4,7 @@
  */
 package Dominio;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.Calendar;
@@ -54,6 +55,7 @@ public class Publicacion implements Serializable{
     @Column (name="imagen",nullable=true,length=45)
     private String imagen;
 
+    @JsonIgnoreProperties("publicaciones")
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE
@@ -120,6 +122,14 @@ public class Publicacion implements Serializable{
     public Publicacion(Usuario usuario, String mensaje, Calendar fechaHora) {
         this.usuario = usuario;
         this.mensaje = mensaje;
+        this.fechaHora = fechaHora;
+    }
+
+    public Publicacion(Long id, Usuario usuario, String mensaje, List<Etiqueta> etiquetas, Calendar fechaHora) {
+        this.id = id;
+        this.usuario = usuario;
+        this.mensaje = mensaje;
+        this.etiquetas = etiquetas;
         this.fechaHora = fechaHora;
     }
     

@@ -8,8 +8,12 @@ import Datos.IPublicacionesDAO;
 import Datos.PublicacionesDAO;
 import Dominio.Etiqueta;
 import Dominio.Publicacion;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -64,9 +68,19 @@ public class CtrlPublicacion {
         return publicacionesDAO.consultarPublicacion(mapper(publicacionJson).getId());
     }
     
-    public List<Publicacion> consultarTodas()
+    public String consultarTodas()
     {
-        return publicacionesDAO.consultarTodas();
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Publicacion> publicaciones = publicacionesDAO.consultarTodas();
+        String publicacionesJson = null;
+        try 
+        {
+            publicacionesJson = objectMapper.writeValueAsString(publicaciones);
+        } catch (JsonProcessingException ex) 
+        {
+            Logger.getLogger(CtrlPublicacion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return publicacionesJson;
     }
     
     public List<Publicacion> consultarPorUsuario(String usuarioJson)
