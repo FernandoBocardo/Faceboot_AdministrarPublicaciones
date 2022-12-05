@@ -5,6 +5,7 @@
 package Datos;
 
 import Dominio.Comentario;
+import Dominio.Publicacion;
 import Dominio.Usuario;
 import java.util.List;
 
@@ -18,4 +19,5 @@ public interface IComentariosDAO {
     public Comentario consultarComentario(Long id_comentario);
     public List<Comentario> consultarTodos();
     public List<Comentario> consultarPorUsuario(Usuario usuario);
+    public List<Comentario> consultarPorPublicacion(Publicacion publicacion);
 }

@@ -7,6 +7,8 @@ package Datos;
 import Dominio.Etiqueta;
 import Dominio.Publicacion;
 import Dominio.Usuario;
+import Dominio.UsuarioEtiquetado;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -29,18 +31,42 @@ public class PublicacionesDAO implements IPublicacionesDAO{
             EntityManager em = this.conexion.crearConexion();
             List<Etiqueta> etiquetas = publicacion.getEtiquetas();
             int i = 0;
-            while(i < etiquetas.size())
+            if(etiquetas != null)
             {
-                List<Etiqueta> etiquetaConsultada = em.createQuery(
-                "SELECT e FROM Etiqueta e WHERE e.nombreEtiqueta = ?1")
-                .setParameter(1, etiquetas.get(i).getNombreEtiqueta())
-                .getResultList();
-                if(etiquetaConsultada != null)
+                while(i < etiquetas.size())
                 {
-                    etiquetas.set(i, etiquetaConsultada.get(0));
+                    List<Etiqueta> etiquetaConsultada = em.createQuery(
+                    "SELECT e FROM Etiqueta e WHERE e.nombreEtiqueta = ?1")
+                    .setParameter(1, etiquetas.get(i).getNombreEtiqueta())
+                    .getResultList();
+                    if(!etiquetaConsultada.isEmpty())
+                    {
+                        etiquetas.set(i, etiquetaConsultada.get(0));
+                    }
+                    i++;
                 }
-                i++;
             }
+            publicacion.setEtiquetas(etiquetas);
+            
+            List<UsuarioEtiquetado> usuariosEtiquetados = publicacion.getUsuariosEtiquetados();
+            int j = 0;
+            if(usuariosEtiquetados != null)
+            {
+                while(j < usuariosEtiquetados.size())
+                {
+                    List<UsuarioEtiquetado> usuariosEtiquetadosConsultado = em.createQuery(
+                    "SELECT ue FROM UsuarioEtiquetado ue WHERE ue.nombreUsuario = ?1")
+                    .setParameter(1, usuariosEtiquetados.get(j).getNombreUsuario())
+                    .getResultList();
+                    if(!usuariosEtiquetadosConsultado.isEmpty())
+                    {
+                        usuariosEtiquetados.set(j, usuariosEtiquetadosConsultado.get(0));
+                    }
+                    j++;
+                }
+            }
+            publicacion.setUsuariosEtiquetados(usuariosEtiquetados);
+            
             em.getTransaction().begin();
             em.persist(publicacion);
             em.getTransaction().commit();
@@ -99,7 +125,8 @@ public class PublicacionesDAO implements IPublicacionesDAO{
         try {
             EntityManager em = this.conexion.crearConexion();
             em.getTransaction().begin();
-            em.remove(publicacion);
+            Publicacion publicacionEliminar = consultarPublicacion(publicacion.getId());
+            em.remove(publicacionEliminar);
             em.getTransaction().commit();
             return true;
         } catch (IllegalStateException ex) {
@@ -117,10 +144,37 @@ public class PublicacionesDAO implements IPublicacionesDAO{
                 "SELECT e FROM Etiqueta e WHERE e.nombreEtiqueta = ?1")
                 .setParameter(1, etiqueta.getNombreEtiqueta())
                 .getResultList();
-            return em.createQuery(
+            if(!etiquetaConsultada.isEmpty())
+            {
+                return em.createQuery(
                 "SELECT p FROM Publicacion p WHERE p.etiquetas = ?1")
                 .setParameter(1, etiquetaConsultada.get(0))
                 .getResultList();
+            }
+            else
+            {
+                return new ArrayList<>();
+            }
+        } catch (IllegalStateException ex) {
+            System.err.print("No se pudo consultar las publicaciones");
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    
+    @Override
+    public UsuarioEtiquetado consultarMencionPorUsusario(String nombreUsuario) {
+        try {
+            EntityManager em = this.conexion.crearConexion();
+            List<UsuarioEtiquetado> usuarioEtiquetadoConsultado = em.createQuery(
+                "SELECT ue FROM UsuarioEtiquetado ue WHERE ue.nombreUsuario = ?1")
+                .setParameter(1, nombreUsuario)
+                .getResultList();
+            if(!usuarioEtiquetadoConsultado.isEmpty())
+            {
+                return usuarioEtiquetadoConsultado.get(0);
+            }
+            return null;
         } catch (IllegalStateException ex) {
             System.err.print("No se pudo consultar las publicaciones");
             ex.printStackTrace();

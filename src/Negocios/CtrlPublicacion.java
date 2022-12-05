@@ -4,12 +4,17 @@
  */
 package Negocios;
 
+import Datos.ComentariosDAO;
 import Datos.IPublicacionesDAO;
 import Datos.PublicacionesDAO;
+import Dominio.Comentario;
 import Dominio.Etiqueta;
 import Dominio.Publicacion;
+import Dominio.Usuario;
+import Dominio.UsuarioEtiquetado;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -19,13 +24,32 @@ import java.util.logging.Logger;
  *
  * @author Carlos
  */
-public class CtrlPublicacion {
+public class CtrlPublicacion{
     
+    private static volatile CtrlPublicacion instance;
     private IPublicacionesDAO publicacionesDAO;
+    private ObjectMapper objectMapper;
     
     public CtrlPublicacion()
     {
         this.publicacionesDAO = new PublicacionesDAO();
+        this.objectMapper = new ObjectMapper();
+    }  
+    
+    public static CtrlPublicacion getInstance() 
+    {
+        CtrlPublicacion result = instance;
+        if (result != null) {
+            return result;
+        }
+        synchronized(CtrlPublicacion.class) 
+        {
+            if(instance == null) 
+            {
+                instance = new CtrlPublicacion();
+            }
+        return instance;
+        }
     }
     
     public Publicacion mapper(String json)
@@ -33,7 +57,6 @@ public class CtrlPublicacion {
         Publicacion publicacion = null;
         try
         {
-            ObjectMapper objectMapper = new ObjectMapper();
             publicacion = objectMapper.readValue(json, Publicacion.class);
         }
         catch(Exception e)
@@ -43,9 +66,12 @@ public class CtrlPublicacion {
         return publicacion;
     }
     
-    public boolean registrarPublicacion(String publicacionJson)
+    public boolean registrarPublicacion(String publicacionJson, String usuarioJson)
     {
-        if(publicacionesDAO.registrarPublicacion(mapper(publicacionJson)))
+        Publicacion publicacion = mapper(publicacionJson);
+        Usuario usuario = CtrlUsuario.getInstance().mapper(usuarioJson);
+        publicacion.setUsuario(usuario);
+        if(publicacionesDAO.registrarPublicacion(publicacion))
         {
             return true;
         }
@@ -54,10 +80,8 @@ public class CtrlPublicacion {
     
     public boolean eliminarPublicacion(String publicacionJson, String usuarioJson)
     {
-        List<Publicacion> comentariosDeUsuario = consultarPorUsuario(usuarioJson);
-        if(comentariosDeUsuario.contains(mapper(publicacionJson)))
+        if(publicacionesDAO.eliminarPublicacion(mapper(publicacionJson)))
         {
-            publicacionesDAO.eliminarPublicacion(mapper(publicacionJson));
             return true;
         }
         return false;
@@ -68,14 +92,20 @@ public class CtrlPublicacion {
         return publicacionesDAO.consultarPublicacion(mapper(publicacionJson).getId());
     }
     
-    public String consultarTodas()
+    public String listaPublicacionToJson(List<Publicacion> publicaciones)
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Publicacion> publicaciones = publicacionesDAO.consultarTodas();
         String publicacionesJson = null;
+        List<Publicacion> publicaciones2 = new ArrayList<>();
+        for(Publicacion publicacion: publicaciones)
+        {
+            ComentariosDAO comentariosDAO = new ComentariosDAO();
+            List<Comentario> comentarios = comentariosDAO.consultarPorPublicacion(publicacion);
+            publicacion.setComentarios(comentarios);
+            publicaciones2.add(publicacion);
+        }
         try 
         {
-            publicacionesJson = objectMapper.writeValueAsString(publicaciones);
+            publicacionesJson = objectMapper.writeValueAsString(publicaciones2);
         } catch (JsonProcessingException ex) 
         {
             Logger.getLogger(CtrlPublicacion.class.getName()).log(Level.SEVERE, null, ex);
@@ -83,16 +113,37 @@ public class CtrlPublicacion {
         return publicacionesJson;
     }
     
-    public List<Publicacion> consultarPorUsuario(String usuarioJson)
+    public String consultarTodas()
     {
-        CtrlUsuario ctrlUsuario = new CtrlUsuario();
-        return publicacionesDAO.consultarPorUsuario(ctrlUsuario.mapper(usuarioJson));
+        List<Publicacion> publicaciones = publicacionesDAO.consultarTodas();
+        return listaPublicacionToJson(publicaciones);
     }
     
-    public List<Publicacion> consultarPorEtiqueta(String nombreEtiqueta)
+    public List<Publicacion> consultarPorUsuario(String usuarioJson)
+    {
+        return publicacionesDAO.consultarPorUsuario(CtrlUsuario.getInstance().mapper(usuarioJson));
+    }
+    
+    public String consultarPorEtiqueta(String nombreEtiqueta)
     {
         Etiqueta etiqueta = new Etiqueta(nombreEtiqueta);
-        return publicacionesDAO.consultarPorEtiqueta(etiqueta);
+        List<Publicacion> publicaciones = publicacionesDAO.consultarPorEtiqueta(etiqueta);
+        return listaPublicacionToJson(publicaciones);
+    }
+    
+    public String consultarMencionPorUsusario(String nombreUsuario)
+    {
+        UsuarioEtiquetado usuarioEtiquetado = publicacionesDAO.consultarMencionPorUsusario(nombreUsuario);
+        String usuarioEtiquetadoJson = null;
+        try
+        {
+            usuarioEtiquetadoJson = objectMapper.writeValueAsString(usuarioEtiquetado);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return usuarioEtiquetadoJson;
     }
     
 }

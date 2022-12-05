@@ -7,20 +7,44 @@ package Negocios;
 import Datos.ComentariosDAO;
 import Datos.IComentariosDAO;
 import Dominio.Comentario;
+import Dominio.Publicacion;
+import Dominio.Usuario;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Carlos
  */
-public class CtrlComentario {
+public class CtrlComentario{
     
+    private static volatile CtrlComentario instance;
     private IComentariosDAO comentariosDAO;
+    private ObjectMapper objectMapper;
     
     public CtrlComentario()
     {
         this.comentariosDAO = new ComentariosDAO();
+        this.objectMapper = new ObjectMapper();
+    }
+    
+    public static CtrlComentario getInstance() 
+    {
+        CtrlComentario result = instance;
+        if (result != null) {
+            return result;
+        }
+        synchronized(CtrlComentario.class) 
+        {
+            if(instance == null) 
+            {
+                instance = new CtrlComentario();
+            }
+        return instance;
+        }
     }
     
     public Comentario mapper(String json)
@@ -28,7 +52,6 @@ public class CtrlComentario {
         Comentario comentario = null;
         try
         {
-            ObjectMapper objectMapper = new ObjectMapper();
             comentario = objectMapper.readValue(json, Comentario.class);
         }
         catch(Exception e)
@@ -38,9 +61,12 @@ public class CtrlComentario {
         return comentario;
     }
     
-    public boolean registrarComentario(String comentarioJson)
+    public boolean registrarComentario(String comentarioJson, String usuarioJson)
     {
-        if(comentariosDAO.registrarComentario(mapper(comentarioJson)))
+        Comentario comentario = mapper(comentarioJson);
+        Usuario usuario = CtrlUsuario.getInstance().mapper(usuarioJson);
+        comentario.setUsuario(usuario);
+        if(comentariosDAO.registrarComentario(comentario))
         {
             return true;
         }
@@ -49,8 +75,7 @@ public class CtrlComentario {
     
     public List<Comentario> consultarPorUsuario(String usuarioJson)
     {
-        CtrlUsuario ctrlUsuario = new CtrlUsuario();
-        return comentariosDAO.consultarPorUsuario(ctrlUsuario.mapper(usuarioJson));
+        return comentariosDAO.consultarPorUsuario(CtrlUsuario.getInstance().mapper(usuarioJson));
     }
     
     public boolean eliminarComentario(String comentarioJson, String usuarioJson)
@@ -69,9 +94,33 @@ public class CtrlComentario {
         return comentariosDAO.consultarComentario(mapper(publicacionJson).getId());
     }
     
-    public List<Comentario> consultarTodos()
+    public String consultarTodos()
     {
-        return comentariosDAO.consultarTodos();
+        List<Comentario> comentarios = comentariosDAO.consultarTodos();
+        String comentariosJson = null;
+        try 
+        {
+            comentariosJson = objectMapper.writeValueAsString(comentarios);
+        } catch (JsonProcessingException ex) 
+        {
+            Logger.getLogger(CtrlComentario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return comentariosJson;
+    }
+    
+    public String consultarPorPublicacion(String publicacionJson)
+    {
+        Publicacion publicacion = CtrlPublicacion.getInstance().mapper(publicacionJson);
+        List<Comentario> comentarios = comentariosDAO.consultarPorPublicacion(publicacion);
+        String comentariosJson = null;
+        try 
+        {
+            comentariosJson = objectMapper.writeValueAsString(comentarios);
+        } catch (JsonProcessingException ex) 
+        {
+            Logger.getLogger(CtrlComentario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return comentariosJson;
     }
     
 }

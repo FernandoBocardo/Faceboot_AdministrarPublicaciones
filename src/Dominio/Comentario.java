@@ -7,6 +7,7 @@ package Dominio;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.FileInputStream;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -17,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -43,6 +46,10 @@ public class Comentario implements Serializable{
     @ManyToOne()
     @JoinColumn(name = "id_publicacion")
     private Publicacion publicacion;
+    
+    @Column (name="fechaHora",nullable=false)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Calendar fechaHora;
 
     public Comentario() {
     }
@@ -51,18 +58,15 @@ public class Comentario implements Serializable{
         this.id = id;
     }
 
-    public Comentario(Long id, Usuario usuario, String mensaje, Publicacion publicacion) {
+    public Comentario(Long id, Usuario usuario, String mensaje, Publicacion publicacion, Calendar fechaHora) {
         this.id = id;
         this.usuario = usuario;
         this.mensaje = mensaje;
         this.publicacion = publicacion;
+        this.fechaHora = fechaHora;
     }
 
-    public Comentario(Usuario usuario, String mensaje, Publicacion publicacion) {
-        this.usuario = usuario;
-        this.mensaje = mensaje;
-        this.publicacion = publicacion;
-    }
+    
 
     public Long getId() {
         return id;
@@ -95,6 +99,14 @@ public class Comentario implements Serializable{
     public void setPublicacion(Publicacion publicacion) {
         this.publicacion = publicacion;
     }
+
+    public Calendar getFechaHora() {
+        return fechaHora;
+    }
+
+    public void setFechaHora(Calendar fechaHora) {
+        this.fechaHora = fechaHora;
+    }
     
     @Override
     public int hashCode() {
@@ -120,7 +132,9 @@ public class Comentario implements Serializable{
 
     @Override
     public String toString() {
-        return "Comentario{" + "id=" + id + ", usuario=" + usuario + ", mensaje=" + mensaje + ", publicacion=" + publicacion + '}';
+        return "Comentario{" + "id=" + id + ", usuario=" + usuario + ", mensaje=" + mensaje + ", publicacion=" + publicacion + ", fechaHora=" + fechaHora + '}';
     }
+
+    
 
 }

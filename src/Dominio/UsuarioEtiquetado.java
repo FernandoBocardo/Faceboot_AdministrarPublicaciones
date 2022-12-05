@@ -4,13 +4,16 @@
  */
 package Dominio;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -31,9 +34,9 @@ public class UsuarioEtiquetado implements Serializable {
     @Column (name="nombreUsuario",nullable=false,length=45)
     private String nombreUsuario;
     
-    @ManyToOne()
-    @JoinColumn(name = "id_publicacion")
-    private Publicacion publicacion;
+    @JsonIgnoreProperties("usuariosEtiquetados")
+    @ManyToMany(mappedBy = "usuariosEtiquetados")
+    private List<Publicacion> publicaciones;
 
     public UsuarioEtiquetado() {
     }
@@ -42,15 +45,19 @@ public class UsuarioEtiquetado implements Serializable {
         this.id = id;
     }
 
-    public UsuarioEtiquetado(Long id, String nombreUsuario, Publicacion publicacion) {
+    public UsuarioEtiquetado(Long id, String nombreUsuario, List<Publicacion> publicaciones) {
         this.id = id;
         this.nombreUsuario = nombreUsuario;
-        this.publicacion = publicacion;
+        this.publicaciones = publicaciones;
     }
 
-    public UsuarioEtiquetado(String nombreUsuario, Publicacion publicacion) {
+    public UsuarioEtiquetado(String nombreUsuario, List<Publicacion> publicaciones) {
         this.nombreUsuario = nombreUsuario;
-        this.publicacion = publicacion;
+        this.publicaciones = publicaciones;
+    }
+    
+    public UsuarioEtiquetado(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public Long getId() {
@@ -69,13 +76,14 @@ public class UsuarioEtiquetado implements Serializable {
         this.nombreUsuario = nombreUsuario;
     }
 
-    public Publicacion getPublicacion() {
-        return publicacion;
+    public List<Publicacion> getPublicaciones() {
+        return publicaciones;
     }
 
-    public void setPublicacion(Publicacion publicacion) {
-        this.publicacion = publicacion;
+    public void setPublicaciones(List<Publicacion> publicaciones) {
+        this.publicaciones = publicaciones;
     }
+    
 
     @Override
     public int hashCode() {
@@ -99,7 +107,8 @@ public class UsuarioEtiquetado implements Serializable {
 
     @Override
     public String toString() {
-        return "UsuarioEtiquetado{" + "id=" + id + ", nombreUsuario=" + nombreUsuario + ", publicacion=" + publicacion + '}';
-    }   
+        return "UsuarioEtiquetado{" + "id=" + id + ", nombreUsuario=" + nombreUsuario + ", publicaciones=" + publicaciones + '}';
+    }
+    
     
 }

@@ -7,6 +7,7 @@ package Datos;
 import Dominio.Etiqueta;
 import Dominio.Publicacion;
 import Dominio.Usuario;
+import Dominio.UsuarioEtiquetado;
 import java.util.List;
 
 /**
@@ -20,4 +21,5 @@ public interface IPublicacionesDAO {
     public List<Publicacion> consultarTodas();
     public List<Publicacion> consultarPorUsuario(Usuario usuario);
     public List<Publicacion> consultarPorEtiqueta(Etiqueta etiqueta);
+    public UsuarioEtiquetado consultarMencionPorUsusario(String nombreUsuario);
 }

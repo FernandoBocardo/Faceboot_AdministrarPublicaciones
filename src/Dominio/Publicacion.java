@@ -46,6 +46,7 @@ public class Publicacion implements Serializable{
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
     
+    @JsonIgnoreProperties("publicacion")
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "publicacion")
     private List<Comentario> comentarios;
     
@@ -53,7 +54,7 @@ public class Publicacion implements Serializable{
     private String mensaje;
     
     @Column (name="imagen",nullable=true,length=45)
-    private String imagen;
+    private byte[] imagen;
 
     @JsonIgnoreProperties("publicaciones")
     @ManyToMany(cascade = {
@@ -71,7 +72,16 @@ public class Publicacion implements Serializable{
     @Temporal(value = TemporalType.TIMESTAMP)
     private Calendar fechaHora;
     
-    @OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("publicaciones")
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(
+            name = "publicacion_usuarioEtiquetado",
+            joinColumns = {@JoinColumn(name = "id_publicacion")},
+            inverseJoinColumns = {@JoinColumn(name = "id_usuarioEtiquetado")}
+    )
     private List<UsuarioEtiquetado> usuariosEtiquetados;
 
     public Publicacion() {
@@ -81,7 +91,7 @@ public class Publicacion implements Serializable{
         this.id = id;
     }
 
-    public Publicacion(Long id, Usuario usuario, List<Comentario> comentarios, String mensaje, String imagen, List<Etiqueta> etiquetas, Calendar fechaHora, List<UsuarioEtiquetado> usuariosEtiquetados) {
+    public Publicacion(Long id, Usuario usuario, List<Comentario> comentarios, String mensaje, byte[] imagen, List<Etiqueta> etiquetas, Calendar fechaHora, List<UsuarioEtiquetado> usuariosEtiquetados) {
         this.id = id;
         this.usuario = usuario;
         this.comentarios = comentarios;
@@ -90,47 +100,6 @@ public class Publicacion implements Serializable{
         this.etiquetas = etiquetas;
         this.fechaHora = fechaHora;
         this.usuariosEtiquetados = usuariosEtiquetados;
-    }
-
-    public Publicacion(Usuario usuario, List<Comentario> comentarios, String mensaje, String imagen, List<Etiqueta> etiquetas, Calendar fechaHora, List<UsuarioEtiquetado> usuariosEtiquetados) {
-        this.usuario = usuario;
-        this.comentarios = comentarios;
-        this.mensaje = mensaje;
-        this.imagen = imagen;
-        this.etiquetas = etiquetas;
-        this.fechaHora = fechaHora;
-        this.usuariosEtiquetados = usuariosEtiquetados;
-    }
-
-    public Publicacion(Usuario usuario, String mensaje, String imagen, List<Etiqueta> etiquetas, Calendar fechaHora, List<UsuarioEtiquetado> usuariosEtiquetados) {
-        this.usuario = usuario;
-        this.mensaje = mensaje;
-        this.imagen = imagen;
-        this.etiquetas = etiquetas;
-        this.fechaHora = fechaHora;
-        this.usuariosEtiquetados = usuariosEtiquetados;
-    }
-    
-    public Publicacion(Usuario usuario, String mensaje, List<Etiqueta> etiquetas, Calendar fechaHora, List<UsuarioEtiquetado> usuariosEtiquetados) {
-        this.usuario = usuario;
-        this.mensaje = mensaje;
-        this.etiquetas = etiquetas;
-        this.fechaHora = fechaHora;
-        this.usuariosEtiquetados = usuariosEtiquetados;
-    }
-
-    public Publicacion(Usuario usuario, String mensaje, Calendar fechaHora) {
-        this.usuario = usuario;
-        this.mensaje = mensaje;
-        this.fechaHora = fechaHora;
-    }
-
-    public Publicacion(Long id, Usuario usuario, String mensaje, List<Etiqueta> etiquetas, Calendar fechaHora) {
-        this.id = id;
-        this.usuario = usuario;
-        this.mensaje = mensaje;
-        this.etiquetas = etiquetas;
-        this.fechaHora = fechaHora;
     }
     
     public Long getId() {
@@ -165,11 +134,11 @@ public class Publicacion implements Serializable{
         this.mensaje = mensaje;
     }
 
-    public String getImagen() {
+    public byte[] getImagen() {
         return imagen;
     }
 
-    public void setImagen(String imagen) {
+    public void setImagen(byte[] imagen) {
         this.imagen = imagen;
     }
 

@@ -5,6 +5,7 @@
 package Datos;
 
 import Dominio.Comentario;
+import Dominio.Publicacion;
 import Dominio.Usuario;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -86,6 +87,21 @@ public class ComentariosDAO implements IComentariosDAO{
             EntityManager em = this.conexion.crearConexion();
             return em.createQuery(
                 "SELECT c FROM Comentario c")
+                .getResultList();
+        } catch (IllegalStateException ex) {
+            System.err.print("No se pudo consultar los comentarios");
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Comentario> consultarPorPublicacion(Publicacion publicacion) {
+        try {
+            EntityManager em = this.conexion.crearConexion();
+            return em.createQuery(
+                "SELECT c FROM Comentario c WHERE c.publicacion = ?1")
+                .setParameter(1, publicacion)
                 .getResultList();
         } catch (IllegalStateException ex) {
             System.err.print("No se pudo consultar los comentarios");
