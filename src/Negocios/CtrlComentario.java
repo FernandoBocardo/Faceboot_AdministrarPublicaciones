@@ -5,46 +5,122 @@
 package Negocios;
 
 import Datos.ComentariosDAO;
+import Datos.IComentariosDAO;
 import Dominio.Comentario;
+import Dominio.Publicacion;
+import Dominio.Usuario;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Carlos
  */
-public class CtrlComentario {
-    private ComentariosDAO comentariosDAO = new ComentariosDAO();
+public class CtrlComentario{
+    
+    private static volatile CtrlComentario instance;
+    private IComentariosDAO comentariosDAO;
+    private ObjectMapper objectMapper;
+    
+    public CtrlComentario()
+    {
+        this.comentariosDAO = new ComentariosDAO();
+        this.objectMapper = new ObjectMapper();
+    }
+    
+    public static CtrlComentario getInstance() 
+    {
+        CtrlComentario result = instance;
+        if (result != null) {
+            return result;
+        }
+        synchronized(CtrlComentario.class) 
+        {
+            if(instance == null) 
+            {
+                instance = new CtrlComentario();
+            }
+        return instance;
+        }
+    }
     
     public Comentario mapper(String json)
     {
-        Comentario publicacion = null;
+        Comentario comentario = null;
         try
         {
-            ObjectMapper objectMapper = new ObjectMapper();
-            publicacion = objectMapper.readValue(json, Comentario.class);
+            comentario = objectMapper.readValue(json, Comentario.class);
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
-        return publicacion;
+        return comentario;
     }
     
-    public boolean AgregarComentario(String usuarioJson)
+    public boolean registrarComentario(String comentarioJson, String usuarioJson)
     {
-        if(comentariosDAO.AgregarComentario(mapper(usuarioJson)))
+        Comentario comentario = mapper(comentarioJson);
+        Usuario usuario = CtrlUsuario.getInstance().mapper(usuarioJson);
+        comentario.setUsuario(usuario);
+        if(comentariosDAO.registrarComentario(comentario))
         {
             return true;
         }
         return false;
     }
     
-    public boolean EliminarComentario(String usuarioJson)
+    public List<Comentario> consultarPorUsuario(String usuarioJson)
     {
-        if(comentariosDAO.EliminarComentario(mapper(usuarioJson),null))
+        return comentariosDAO.consultarPorUsuario(CtrlUsuario.getInstance().mapper(usuarioJson));
+    }
+    
+    public boolean eliminarComentario(String comentarioJson, String usuarioJson)
+    {
+        List<Comentario> comentariosDeUsuario = consultarPorUsuario(usuarioJson);
+        if(comentariosDeUsuario.contains(mapper(comentarioJson)))
         {
+            comentariosDAO.eliminarComentario(mapper(comentarioJson));
             return true;
         }
         return false;
     }
+    
+    public Comentario consultarComentario(String publicacionJson)
+    {
+        return comentariosDAO.consultarComentario(mapper(publicacionJson).getId());
+    }
+    
+    public String consultarTodos()
+    {
+        List<Comentario> comentarios = comentariosDAO.consultarTodos();
+        String comentariosJson = null;
+        try 
+        {
+            comentariosJson = objectMapper.writeValueAsString(comentarios);
+        } catch (JsonProcessingException ex) 
+        {
+            Logger.getLogger(CtrlComentario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return comentariosJson;
+    }
+    
+    public String consultarPorPublicacion(String publicacionJson)
+    {
+        Publicacion publicacion = CtrlPublicacion.getInstance().mapper(publicacionJson);
+        List<Comentario> comentarios = comentariosDAO.consultarPorPublicacion(publicacion);
+        String comentariosJson = null;
+        try 
+        {
+            comentariosJson = objectMapper.writeValueAsString(comentarios);
+        } catch (JsonProcessingException ex) 
+        {
+            Logger.getLogger(CtrlComentario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return comentariosJson;
+    }
+    
 }
