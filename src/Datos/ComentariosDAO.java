@@ -43,7 +43,8 @@ public class ComentariosDAO implements IComentariosDAO{
         try {
             EntityManager em = this.conexion.crearConexion();
             em.getTransaction().begin();
-            em.remove(comentario);
+            Comentario comentarioEliminar = consultarComentario(comentario.getId());
+            em.remove(comentarioEliminar);
             em.getTransaction().commit();
             return true;
         } catch (IllegalStateException ex) {
